@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 #include "DataStructures.h"
 #include "mypthreads.h"
 #include "Schedulers.h"
@@ -27,12 +16,11 @@ int tiquete = 0;
 //Funcion que retorna el primer hilo de la lista que rea del scheduler RoundRobin
 static HN obtenerPrimeroRoundRobin(HNCola threadsQueue)
 {
-	/*
+	//Moviendo al siguiente en la lista
 	if(getHeadHN(threadsQueue)->HilosCompleted == 0)
 	{
 		moveForward(threadsQueue);
 	}
-	*/
 
 	HN hiloResultado = NULL;
 	int i = 0;

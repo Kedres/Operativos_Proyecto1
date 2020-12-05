@@ -1,11 +1,22 @@
-#include "DataStructures.c"
-#include "mypthreads.c"
+
+
+
+
+
+
+
+
+
+
+
+#include "DataStructures.h"
+#include "mypthreads.h"
 #include "Schedulers.h"
 
-sigset_t mascara;
-HNCola threadsQueue;
-struct itimerval timeQuantum;
-long timeInterval;
+extern sigset_t sigProcMask;
+extern HNCola threadsQueue;
+extern struct itimerval timeQuantum;
+extern long timeInterval;
 
 int roundRobinControl = 0;
 int sorteoControl = 0;
@@ -21,9 +32,11 @@ static int existeEnHilos(int* hilosGenerados, int valorEncontradoHilos, int cant
 static int generarTiquete(HNCola cola, int* generarHilos, int cantSorteo);
 static HN obtenerPrimeroSorteo(HNCola cola);
 
+
+
 void sorteoScheduler()
 {
-	sigprocmask(SIG_BLOCK, &mascara, NULL);
+	sigprocmask(SIG_BLOCK, &sigProcMask, NULL);
 	HN hiloActual = obtenerPrimeroSorteo(threadsQueue);
 	HN hiloAnterior = threadsQueue->currentThread;
 
@@ -67,7 +80,7 @@ void sorteoScheduler()
 			threadsQueue->currentThread = hiloActual;
 		}
 	}
-	sigprocmask(SIG_UNBLOCK, &mascara, NULL);
+	sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 }
 
 //Funcion que busca el primer hilo valido para el schedule de sorteo
@@ -211,7 +224,7 @@ static void borrarHilosGenerados(int* hilosGenerados, int idHilo, int cantSorteo
 	{
 		if(hilosGenerados[i] == idHilo)
 		{
-			hilosGenerados[i] == 0;
+			hilosGenerados[i] = 0;
 		}
 		i++;
 	}
@@ -242,12 +255,12 @@ static void cambiarScheduler();
 //Función que ejecuta el realTime Schaduler
 void realTime()
 {
-	printf("entre al scheduler\n");
-	sigprocmask(SIG_BLOCK, &mascara, NULL);
+	//printf("entre al scheduler\n");
+	sigprocmask(SIG_BLOCK, &sigProcMask, NULL);
 	threadsQueue->quantums++;
 	revisarHilos();
 	//cambiarScheduler();
-	sigprocmask(SIG_UNBLOCK, &mascara, NULL);
+	sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 }
 
 //Revisa todos los hilos uno por uno por si ubiera que aumentar la prioridad de alguno
@@ -279,7 +292,7 @@ static void comprobarHilo(HN hilo)
 		}
 		aumentarPrioridad(hilo);
 	}
-	printf("estoy dentro\n");
+	//printf("estoy dentro\n");
 }
 
 //Da una cantidad de hilos acorde al warning solicitado

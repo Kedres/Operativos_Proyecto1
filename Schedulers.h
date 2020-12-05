@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 void realTime();
 void sorteoScheduler();
 

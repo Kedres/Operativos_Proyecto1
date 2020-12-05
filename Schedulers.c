@@ -22,6 +22,98 @@ int roundRobinControl = 0;
 int sorteoControl = 0;
 int tiquete = 0;
 
+//--------------------------------------RoundRobin-----------------------------------------
+
+//Funcion que retorna el primer hilo de la lista que rea del scheduler RoundRobin
+static HN obtenerPrimeroRoundRobin(HNCola threadsQueue)
+{
+	/*
+	if(getHeadHN(threadsQueue)->HilosCompleted == 0)
+	{
+		moveForward(threadsQueue);
+	}
+	*/
+
+	HN hiloResultado = NULL;
+	int i = 0;
+	int totalHilos = getHNCount(threadsQueue);
+	int hilosRoundRobin = getHNRoundRobinCount(threadsQueue);
+	HN hiloHeader = getHeadHN(threadsQueue);
+
+	while(i < totalHilos && hilosRoundRobin > 0)
+	{
+		//Revisa si el hilo es administrado por RoundRobin y si tiene que ejecutar algo
+		//Sino se elimana de paso
+		if (hiloHeader->HilosCompleted && hiloHeader->roundRobin)
+		{
+			if (threadsQueue->currentThread == hiloHeader)
+			{
+				threadsQueue->currentThread = NULL;
+			}
+			deleteHeadThread(threadsQueue);
+			hiloHeader = getHeadHN(threadsQueue);
+		//Revisa si el hilo no se puede administrar por el Scheduler por una u otra razón
+		}else if (hiloHeader->HilosBlocked || hiloHeader->sorteo)
+		{
+			moveForward(threadsQueue);
+			hiloHeader = getHeadHN(threadsQueue);
+			i++;
+		//No hay problema con el hilo revisado
+		}else{
+			hiloResultado = hiloHeader;
+			i = totalHilos;
+		}
+	}
+	return hiloResultado;
+}
+
+void roundRobinScheduler()
+{
+	sigprocmask(SIG_BLOCK, &sigProcMask, NULL);
+	HN hiloActual = obtenerPrimeroRoundRobin(threadsQueue);
+	HN hiloAnterior = threadsQueue->currentThread;
+	//DeadLock
+	if (hiloAnterior == NULL && hiloActual == NULL)
+	{
+		exit(1);
+	//No hay RoundRobin para ser usado
+	}else if (hiloActual == NULL)
+	{
+		threadsQueue->currentThreadCopy = hiloAnterior;
+		threadsQueue->currentThread = NULL;
+		my_thread_yield();
+	//En la selección anterior no se escogio ningún hilo 
+	}else if(hiloAnterior == NULL && hiloActual != threadsQueue->currentThreadCopy)
+	{
+		threadsQueue->currentThread = hiloActual;
+		timeQuantum.it_value.tv_usec = timeInterval;
+		if (threadsQueue->currentThreadCopy != NULL)
+		{
+			HN aux = threadsQueue->currentThreadCopy;
+			threadsQueue->currentThreadCopy = NULL;
+			swapcontext(&(aux->hiloContext), &(hiloActual->hiloContext));
+		}else
+		{
+			setcontext(&(hiloActual->hiloContext));
+		}
+	//Todo bien
+	}else
+	{
+		if (hiloAnterior != NULL && hiloAnterior != hiloActual)
+		{
+			threadsQueue->currentThread = hiloActual;
+			threadsQueue->currentThreadCopy = NULL;
+			timeQuantum.it_value.tv_usec = timeInterval;
+			swapcontext(&(hiloAnterior->hiloContext), &(hiloActual->hiloContext));
+		}else
+		{
+			threadsQueue->currentThread = hiloActual;
+		}
+	}
+	sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
+}
+
+
 //---------------------------------------------Sorteo--------------------------------------
 
 static void insertarValorHilosGenerados(int* hilosGenerados, int idHilo, int cantSorteo);
@@ -88,11 +180,11 @@ void sorteoScheduler()
 static HN obtenerPrimeroSorteo(HNCola cola)
 {
 	HN hiloResultado = NULL;
-	int cantSorteo = getHNSortCount(threadsQueue);
+	int cantSorteo = getHNSortCount(cola);
 	int* generarHilos = (int*)calloc(cantSorteo, sizeof(int));
-	tiquete = generarTiquete(threadsQueue, generarHilos, cantSorteo);	
+	tiquete = generarTiquete(cola, generarHilos, cantSorteo);	
 	printf("El tiquete inicial para el hilo fue: %i\n", tiquete);
-	HN hiloHeader = searchThreadTicket(tiquete, threadsQueue);
+	HN hiloHeader = searchThreadTicket(tiquete, cola);
 
 	if (hilosBloqueados(cola))
 	{
@@ -148,7 +240,7 @@ static int generarTiquete(HNCola cola, int* generarHilos, int cantSorteo)
 {
 	int random = ((rand() % (searchEndTicket(cola) -1)) + 1);
 
-	while(existeEnHilos(generarHilos, (int)searchThreadTicket(random, threadsQueue)->hiloID, cantSorteo)){
+	while(existeEnHilos(generarHilos, (int)searchThreadTicket(random, cola)->hiloID, cantSorteo)){
 		random = ((rand() % (searchEndTicket(cola) -1)) + 1);
 	}
 	return random;
@@ -259,7 +351,7 @@ void realTime()
 	sigprocmask(SIG_BLOCK, &sigProcMask, NULL);
 	threadsQueue->quantums++;
 	revisarHilos();
-	//cambiarScheduler();
+	cambiarScheduler();
 	sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 }
 
@@ -329,7 +421,7 @@ static void cambiarScheduler()
 	{
 		printf("Primer caso de roundRobin\n");
 		sorteoControl = 0;
-		//roundRobinScheduler();
+		roundRobinScheduler();
 	}else if (roundRobinControl && cantSorteo > 0)
 	{
 		printf("segundo caso de sorteo\n");
@@ -341,7 +433,7 @@ static void cambiarScheduler()
 		printf("segundo caso de roundRobin\n");
 		roundRobinControl = 1;
 		sorteoControl = 0;
-		//roundRobinScheduler();
+		roundRobinScheduler();
 	}else
 	{
 		printf("No hay threads en ninguno de los schedules\n");

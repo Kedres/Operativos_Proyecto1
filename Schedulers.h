@@ -12,5 +12,6 @@
 
 void realTime();
 void sorteoScheduler();
+void roundRobinScheduler();
 
 #endif

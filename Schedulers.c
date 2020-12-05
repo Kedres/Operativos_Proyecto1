@@ -69,6 +69,7 @@ void roundRobinScheduler()
 	{
 		threadsQueue->currentThreadCopy = hiloAnterior;
 		threadsQueue->currentThread = NULL;
+		sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 		my_thread_yield();
 	//En la selección anterior no se escogio ningún hilo 
 	}else if(hiloAnterior == NULL && hiloActual != threadsQueue->currentThreadCopy)
@@ -79,9 +80,11 @@ void roundRobinScheduler()
 		{
 			HN aux = threadsQueue->currentThreadCopy;
 			threadsQueue->currentThreadCopy = NULL;
+			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			swapcontext(&(aux->hiloContext), &(hiloActual->hiloContext));
 		}else
 		{
+			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			setcontext(&(hiloActual->hiloContext));
 		}
 	//Todo bien
@@ -92,13 +95,14 @@ void roundRobinScheduler()
 			threadsQueue->currentThread = hiloActual;
 			threadsQueue->currentThreadCopy = NULL;
 			timeQuantum.it_value.tv_usec = timeInterval;
+			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			swapcontext(&(hiloAnterior->hiloContext), &(hiloActual->hiloContext));
 		}else
 		{
 			threadsQueue->currentThread = hiloActual;
+			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 		}
 	}
-	sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 }
 
 
@@ -131,6 +135,7 @@ void sorteoScheduler()
 		printf("El siguiente hilo a funcionar esta en NULL.\n"); 
 		threadsQueue->currentThreadCopy = threadsQueue->currentThread;
 		threadsQueue->currentThread = NULL;
+		sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 		my_thread_yield();
 	//RoundRobin se quedo sin hilos para funcionar por algún motivo o el anterior era del tipo sorteo y termino 
 	}else if (hiloAnterior == NULL && hiloActual != threadsQueue->currentThreadCopy)
@@ -142,10 +147,12 @@ void sorteoScheduler()
 			printf("El hilo anterior estaba en NULL, cambiandolo a otro posible\n");
 			HN aux = threadsQueue->currentThreadCopy;
 			threadsQueue->currentThreadCopy = NULL;
+			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			swapcontext(&(aux->hiloContext), &(hiloActual->hiloContext));
 		}else
 		{
 			printf("El hilo anterior estaba en NULL, cambiandolo a otro posible\n");
+			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			setcontext(&(hiloActual->hiloContext));
 		}
 	}else{
@@ -155,12 +162,13 @@ void sorteoScheduler()
 			threadsQueue->currentThread = hiloActual;
 			threadsQueue->currentThreadCopy = NULL;
 			timeQuantum.it_value.tv_usec = timeInterval;
+			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			swapcontext(&(hiloAnterior->hiloContext), &(hiloActual->hiloContext));
 		}else{
 			threadsQueue->currentThread = hiloActual;
+			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 		}
 	}
-	sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 }
 
 //Funcion que busca el primer hilo valido para el schedule de sorteo

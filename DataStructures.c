@@ -42,6 +42,8 @@ MutexCola mutexCola = NULL;
 
 static int getHiloID()
 {
+    
+    
     return ++actHiloID;
 }
 
@@ -457,6 +459,8 @@ int insertThread(HNCola pQueue, HN pThread)
 	{
 		if(pQueue->head == NULL)
 		{
+			
+			printf("\n id a meter :%ld \n",pThread->hiloID);
 			pThread->nextHilo = pThread;
 			pQueue->headParent = pThread;
 			pQueue->head = pThread;
@@ -484,7 +488,7 @@ int insertWaitingThread(HN pTargetThread, HN pThreadAdded)
 	HilosEspera newWaitingThread = createWaitingThreadsList();
 	if(newWaitingThread != NULL)
 	{
-		pTargetThread->hilosEspera++;
+		pTargetThread->HiloWaiting++;
 		newWaitingThread->waitingThreadNode = pThreadAdded;
 		newWaitingThread->nextHiloEspera = pTargetThread->hilosEspera;
 		pTargetThread->hilosEspera = newWaitingThread;

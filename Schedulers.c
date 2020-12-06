@@ -11,12 +11,15 @@ int roundRobinControl = 0;
 int sorteoControl = 0;
 int tiquete = 0;
 
+void printQueue(HNCola pQueue);
+
 //--------------------------------------RoundRobin-----------------------------------------
 
 //Funcion que retorna el primer hilo de la lista que rea del scheduler RoundRobin
 static HN obtenerPrimeroRoundRobin(HNCola threadsQueue)
 {
 	//Moviendo al siguiente en la lista
+	//printf("\n id %ld \n",getHeadHN(threadsQueue)->hiloID);
 	if(getHeadHN(threadsQueue)->HilosCompleted == 0)
 	{
 		moveForward(threadsQueue);
@@ -127,12 +130,12 @@ void sorteoScheduler()
 	//Si no hay hilos para poner en funcionamiento desde hace un tiempo
 	if(hiloAnterior == NULL && hiloActual == NULL)
 	{
-		printf("Ocurrio un posible Deadlock en el schaduler sorteo.\n");
+		//printf("Ocurrio un posible Deadlock en el schaduler sorteo.\n");
 		exit(1);
 	//No hay uno disponible para actuar
 	}else if (hiloActual == NULL)
 	{
-		printf("El siguiente hilo a funcionar esta en NULL.\n"); 
+		//printf("El siguiente hilo a funcionar esta en NULL.\n"); 
 		threadsQueue->currentThreadCopy = threadsQueue->currentThread;
 		threadsQueue->currentThread = NULL;
 		sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
@@ -140,30 +143,34 @@ void sorteoScheduler()
 	//RoundRobin se quedo sin hilos para funcionar por algún motivo o el anterior era del tipo sorteo y termino 
 	}else if (hiloAnterior == NULL && hiloActual != threadsQueue->currentThreadCopy)
 	{
+		//printf("\naqui\n");
 		threadsQueue->currentThread = hiloActual;
 		timeQuantum.it_value.tv_usec = timeInterval;
 		if(threadsQueue->currentThreadCopy != NULL)
 		{
-			printf("El hilo anterior estaba en NULL, cambiandolo a otro posible\n");
+			//printf("El hilo anterior estaba en NULL, cambiandolo a otro posible\n");
 			HN aux = threadsQueue->currentThreadCopy;
 			threadsQueue->currentThreadCopy = NULL;
 			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			swapcontext(&(aux->hiloContext), &(hiloActual->hiloContext));
+			
 		}else
 		{
-			printf("El hilo anterior estaba en NULL, cambiandolo a otro posible\n");
+			//printf("El hilo anterior estaba en NULL, cambiandolo a otro posible\n");
 			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			setcontext(&(hiloActual->hiloContext));
 		}
 	}else{
 		if (hiloAnterior != NULL && hiloAnterior != hiloActual)
 		{
-			printf("Cambiando hilo\n");
+			//printf("Cambiando hilo %ld \n",threadsQueue->currentThread->hiloID);
 			threadsQueue->currentThread = hiloActual;
 			threadsQueue->currentThreadCopy = NULL;
 			timeQuantum.it_value.tv_usec = timeInterval;
 			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
+			//printf("\naqui2\n");
 			swapcontext(&(hiloAnterior->hiloContext), &(hiloActual->hiloContext));
+			
 		}else{
 			threadsQueue->currentThread = hiloActual;
 			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
@@ -179,12 +186,12 @@ static HN obtenerPrimeroSorteo(HNCola cola)
 	int cantSorteo = getHNSortCount(cola);
 	int* generarHilos = (int*)calloc(cantSorteo, sizeof(int));
 	tiquete = generarTiquete(cola, generarHilos, cantSorteo);	
-	printf("El tiquete inicial para el hilo fue: %i\n", tiquete);
+	//printf("El tiquete inicial para el hilo fue: %i\n", tiquete);
 	HN hiloHeader = searchThreadTicket(tiquete, cola);
 
 	if (hilosBloqueados(cola))
 	{
-		printf("Todos los hilos de sorteo bloqueados\n");
+		//printf("Todos los hilos de sorteo bloqueados\n");
 		tiquete = 0;
 		hiloResultado = NULL;
 	}else
@@ -202,7 +209,7 @@ static HN obtenerPrimeroSorteo(HNCola cola)
 				deleteSortThread(hiloHeader->hiloID, cola);
 				if (getHNSortCount(cola) == 0 || hilosBloqueados(cola))
 				{
-					printf("Imposible seguir administrando hilos sorteo en este momento\n");
+					//printf("Imposible seguir administrando hilos sorteo en este momento\n");
 					tiquete = 0;
 					hiloResultado = NULL;
 					break;
@@ -215,13 +222,13 @@ static HN obtenerPrimeroSorteo(HNCola cola)
 				}
 			}else if (hiloHeader->HilosBlocked || hiloHeader->roundRobin)
 			{
-				printf("Hilo bloqueado o de scheduler incompatible para sorteo.\n");
+				//printf("Hilo bloqueado o de scheduler incompatible para sorteo.\n");
 				tiquete = generarTiquete(cola, generarHilos, cantSorteo);
 				hiloHeader = searchThreadTicket(tiquete, cola);
 				insertarValorHilosGenerados(generarHilos, (int)hiloHeader->hiloID, cantSorteo);
 			}else
 			{
-				printf("Se encontro hilo optimo.\n");
+				//printf("Se encontro hilo optimo.\n");
 				hiloResultado = hiloHeader;
 				break;
 			}
@@ -344,11 +351,13 @@ static void cambiarScheduler();
 void realTime()
 {
 	//printf("entre al scheduler\n");
+	//printQueue(threadsQueue);
 	sigprocmask(SIG_BLOCK, &sigProcMask, NULL);
 	threadsQueue->quantums++;
 	revisarHilos();
 	cambiarScheduler();
-	sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
+	//printf("\n sali\n");
+	//sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 }
 
 //Revisa todos los hilos uno por uno por si ubiera que aumentar la prioridad de alguno
@@ -405,37 +414,62 @@ static void aumentarPrioridad(HN hilo)
 //Funcion que cambia el scheduler 
 static void cambiarScheduler()
 {
-	printf("Estoy en el cambio\n");
+	//printf("Estoy en el cambio\n");
 	int cantSorteo = getHNSortCount(threadsQueue);
 	int cantRoundRobin = getHNRoundRobinCount(threadsQueue);
 	if (sorteoControl && cantSorteo > 0 && cantRoundRobin == 0)
 	{
-		printf("Primer caso de Sorteo\n");
+		//printf("Primer caso de Sorteo\n");
 		roundRobinControl = 0;
 		sorteoScheduler();
 	}else if (roundRobinControl && cantRoundRobin > 0 && cantSorteo == 0)
 	{
-		printf("Primer caso de roundRobin\n");
+		//printf("Primer caso de roundRobin\n");
 		sorteoControl = 0;
 		roundRobinScheduler();
 	}else if (roundRobinControl && cantSorteo > 0)
 	{
-		printf("segundo caso de sorteo\n");
+		//printf("segundo caso de sorteo\n");
 		roundRobinControl = 0;
 		sorteoControl = 1;
 		sorteoScheduler();
 	}else if (sorteoControl && cantRoundRobin > 0)
 	{
-		printf("segundo caso de roundRobin\n");
+		//printf("segundo caso de roundRobin\n");
 		roundRobinControl = 1;
 		sorteoControl = 0;
 		roundRobinScheduler();
 	}else
 	{
-		printf("No hay threads en ninguno de los schedules\n");
+		//printf("No hay threads en ninguno de los schedules\n");
 		exit(0);
 	}
 }
+
+void printQueue(HNCola pQueue)
+{
+    HN headThread = getHeadHN(pQueue);
+    HN nextThread = headThread->nextHilo;
+    if(headThread != NULL)
+    {
+        printf("Imprimiendo cola\n");
+        printf("Head: %d\n", (int)headThread->hiloID);
+        printf("Parent: %d\n", (int)pQueue->headParent->hiloID);
+        printf("Thread: %d\n", (int)headThread->hiloID);
+        
+        while(headThread != nextThread)
+        {
+            printf("nextThread: %d\n", (int)nextThread->hiloID);
+            nextThread = nextThread->nextHilo;
+        }
+        printf("Termino la impresion de la cola\n");
+        
+        printf("nextThread: %d\n", (int)nextThread->hiloID);
+    }
+}
+
+
+
 
 //Con lo que probaba yo, descomentar si la necesita
 /*

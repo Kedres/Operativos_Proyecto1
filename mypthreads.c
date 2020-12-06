@@ -87,7 +87,7 @@ void my_thread_init(long pTimeInterval)
 			memset(&schedulerHandle, 0, sizeof (schedulerHandle));
 			schedulerHandle.sa_handler = &realTime;
 			sigaction(SIGPROF, &schedulerHandle, NULL);
-			printf("\nMyThread: Biblioteca MyThread Inicializada...\n");
+			//printf("\nMyThread: Biblioteca MyThread Inicializada...\n");
 			timeQuantum.it_value.tv_sec = 0;
 			timeQuantum.it_value.tv_usec = timeInterval;
 			timeQuantum.it_interval.tv_sec = 0;
@@ -120,9 +120,9 @@ int my_thread_create(thread *pThread, void *(*pStartRoutine)(void *), void *pArg
 			newHN->startQuantum = threadsQueue->quantums;
 			setSchedulerType(newHN, pSchedulerType);
 			makecontext(&(newHN->hiloContext), (void (*)()) wrapperFunction, 2, pStartRoutine, pArgument);
-			setcontext(&(newHN->hiloContext));
+			//setcontext(&(newHN->hiloContext));
 			*pThread = newHN->hiloID;
-			printf("MyThread: Nuevo thread creado: %ld\n", *pThread);
+			printf("MyThread: Nuevo thread creado: %ld\n", newHN->hiloID);
 			
 			insertThread(threadsQueue, newHN);
 			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
@@ -140,6 +140,9 @@ int my_thread_join(thread pThread, void **pStatus)
 {
 	
 	//printf("\nestado del hilo: %d",pThread->HilosBlocked);
+	
+	//printf("\n hiloActual: %ld \n",pThread);
+	
 	sigprocmask(SIG_BLOCK, &sigProcMask, NULL);
 	
 	HN currentThread = threadsQueue->currentThread;
@@ -147,15 +150,18 @@ int my_thread_join(thread pThread, void **pStatus)
 	
 	if (currentThread == targetThread || currentThread == NULL || (targetThread != NULL && targetThread->detach)) 
 	{
-		//printf("\naca\n");
+		
 		sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 		return -1;
 	}
 	else
 	{
+		//printf("\naca2\n");
 		
 		if (targetThread == NULL || targetThread->HilosCompleted) 
 		{
+			
+			
 			HiloMuertoNode deadThreadNode = searchDeadThread(deadThreadsQueue, pThread);
 			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 			if (deadThreadNode != NULL) 
@@ -176,18 +182,21 @@ int my_thread_join(thread pThread, void **pStatus)
 		{
 			
 			insertWaitingThread(targetThread, currentThread);
-			printf("\n%d\n",currentThread->HilosBlocked);
+			
 			int isBlocked = currentThread->HilosBlocked;
 			sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
+			//printf("\naca\n");
 			while (isBlocked) 
 			{
 				
 				isBlocked = currentThread->HilosBlocked;
 			}
+			
 			sigprocmask(SIG_BLOCK, &sigProcMask, NULL);
 			HiloMuertoNode deadThreadNode = searchDeadThread(deadThreadsQueue, pThread);
 			if(deadThreadNode != NULL)
 			{
+				
 				if (pStatus != NULL) 
 				{   
 					*pStatus = *(deadThreadNode->returnValue);
@@ -205,7 +214,7 @@ int my_thread_join(thread pThread, void **pStatus)
 			}
 			else
 			{
-				printf("MyThread: Un thread anterior a este ha realizado el join primero, intente realizando el join para ambos threads antes que el thread al cual desea hacer el join haya finalizado\n");
+				//printf("MyThread: Un thread anterior a este ha realizado el join primero, intente realizando el join para ambos threads antes que el thread al cual desea hacer el join haya finalizado\n");
 				sigprocmask(SIG_UNBLOCK, &sigProcMask, NULL);
 				return 0;
 			}

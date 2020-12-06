@@ -25,62 +25,87 @@
 #include <stdio.h>
 #include "mypthreads.h"
 
-static void *imprimir(void * numero1);
-static void *imprimir2(void * numero1);
+ void *imprimir(void * numero1);
+ void *imprimir2(void * numero1);
+ void *imprimir3(void * numero1);
+
+	thread *threadsArray;
+	HiloMutex generalMutex;
+	HiloMutex useSocket;
 
 
 int main(int argc, char **argv)
 {
 	
-	thread *threadsArray;
-	HiloMutex generalMutex;
-	HiloMutex useSocket;
+	
 	
 	char* s = "Sort";
-	
-	threadsArray = (thread*)malloc(sizeof(thread) * 2);
+	char* s2 = "RoundRobin";
+	threadsArray = (thread*)malloc(sizeof(thread) * 3);
 	
 	my_thread_init(10);
 	my_mutex_init(&generalMutex);
 	my_mutex_init(&useSocket);
 	
-	my_thread_create(&threadsArray[0],imprimir,(void*)10,(int)150,s);
-	//my_thread_yield();
-	//my_thread_exit(0);
+	my_thread_create(&threadsArray[0],imprimir,(void*)10,(int)150,s2);
 	
-	//my_thread_create(&threadsArray[1],imprimir2,(void*)10,(int)150,s);
+	
+	my_thread_create(&threadsArray[1],imprimir2,(void*)10,(int)150,s2);
+	
+	my_thread_create(&threadsArray[2],imprimir3,(void*)10,(int)150,s2);
+	//printf("\n aca join \n");
+	
+	
+	
+	
 	
 	my_thread_join(threadsArray[0],NULL);
-	//my_thread_join(threadsArray[1],NULL);
 	
-	printf("\nhola mundo2\n");
+	my_thread_join(threadsArray[1],NULL);
+	
+	my_thread_join(threadsArray[2],NULL);
+	
+	free(threadsArray);
 	
 	
 	return 0;
 }
 
-static void *imprimir(void * numero1){
+ void *imprimir(void * numero1){
 	
-	char numero[10];
-	scanf("%s",numero);
-	printf("\ntecla : %s\n",numero);
 	
+	my_mutex_lock(&generalMutex);
 	printf("\nhola mundo\n");
-	//my_thread_yield();
+	my_thread_sleep(150);
 	//my_thread_exit(0);
+	my_mutex_unlock(&generalMutex);
 	
-	//printf("\nhola mundo\n");
+	
 	return 0;
 	
 }
 
-static void *imprimir2(void * numero1){
-	/*
-	char numero[10];
-	scanf("%s",numero);
-	printf("\ntecla : %s\n",numero);
-	*/
+ void *imprimir2(void * numero1){
+	
+	my_mutex_lock(&generalMutex);
 	printf("\nhola 2\n");
+	my_thread_sleep(150);
+	//my_thread_exit(0);
+	my_mutex_unlock(&generalMutex);
 	return 0;
 	
 }
+
+void *imprimir3(void * numero1){
+	
+	my_mutex_lock(&generalMutex);
+	printf("\nhola mundo3\n");
+	my_thread_sleep(150);
+	
+	//my_thread_exit(0);
+	my_mutex_unlock(&generalMutex);
+	
+	return 0;
+	
+}
+

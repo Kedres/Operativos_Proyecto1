@@ -2,33 +2,39 @@
 #include "Lenguaje.h"
 
 void imprimirAnimacion(Figura f);
+void moverFigura(Figura f);
 
 void animarFigura(Figura f)
 {
-	printf("elle\n");
 	initscr();
-	//move(10,2);
- 	//printw("Hola Bulma!!!");
- 	//refresh();
- 	//getch();
- 	//sleep(2);
- 	//erase();
- 	//move(11,2);
- 	//printw("me movi");
- 	//refresh();
-	//imprimirAnimacion(f);
- 	///refresh();
+	Figura figura = prepararFigura();
+	//imprimirAnimacion(figura);
+	refresh();
+	moverFigura(figura);
+	liberarFigura(figura);
  	getch();
 	endwin();
-	printf("sali\n");
 }
 
 void imprimirAnimacion(Figura f)
 {
+	int aux = f->posX;
 	for (int i = 0; i < f->largo; ++i)
 	{
-		move((f->posX)+i, f->posY);
+		move(aux+i, f->posY);
 		printw(f->caracteres[i]);
+	}
+}
+
+void moverFigura(Figura f)
+{
+	for (int i = 0; i < f->segFinal; ++i)
+	{
+		erase();
+		imprimirAnimacion(f);
+		refresh();
+		sleep(1);
+		f->posY++;
 	}
 }
 
@@ -52,8 +58,8 @@ int main(int argc, char const *argv[])
  	refresh();
  	getch();
 	endwin();*/
-	Figura figura = prepararFigura();
+	//Figura figura = prepararFigura();
 	animarFigura(NULL);
-	liberarFigura(figura);
+	//liberarFigura(figura);
 	return 0;
 }

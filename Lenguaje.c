@@ -3,20 +3,20 @@
 Figura cargarFigura(char* nombre);
 void limpiar (char *cadena);
 void liberarCaracteres(char** objeto, int largo);
-void rellenarFigura(Figura f, char* ingreso);
+void rellenarFigura(Figura f);
 void liberarFigura(Figura f);
 void imprimirObjeto(char** objeto, int largo);
 
 Figura prepararFigura()
 {
-	char* ingreso = (char *) malloc (100 * sizeof(char));
-	printf("Por favor ingerse el nombre de la figura: ");
-	fgets(ingreso, 100, stdin);
-	limpiar(ingreso);
+	char* ingreso = (char *) malloc (50 * sizeof(char));
+	//printf("Por favor ingerse el nombre de la figura: ");
+	//fgets(ingreso, 100, stdin);
+	//limpiar(ingreso);
 	Figura objeto = cargarFigura(ingreso);
 	if (objeto != NULL)
 	{
-		rellenarFigura(objeto, ingreso);
+		rellenarFigura(objeto);
 		free(ingreso);
 		//liberarFigura(objeto);
 	}else{
@@ -49,14 +49,17 @@ Figura cargarFigura(char* nombre)
 	char **objeto;
 	FILE *archivo;
 
+	printw("Nombre de la figura: ");
+	scanw("%s", nombre);
+	//limpiar(nombre);
 	archivo = fopen(nombre, "r");
 	if(archivo == NULL)
 	{
 		//Manejo de errores
-		printf("No se logro encontrar el archivo\n");
+		printw("No se logro encontrar el archivo\n");
 	}else
 	{
-		printf("archivo encontrado\n");
+		printw("archivo encontrado\n");
 		while((caracter = fgetc(archivo)) != EOF)
 		{
 			if (parametros < 3)
@@ -106,35 +109,37 @@ Figura cargarFigura(char* nombre)
 	return res;
 }
 
-void rellenarFigura(Figura f, char* ingreso)
+void rellenarFigura(Figura f)
 {
-	printf("\n");
-	printf("Ingrese el tiempo de inicio: ");
-	fgets(ingreso, 100, stdin);
-	limpiar(ingreso);
-	f->segInicial = atoi(ingreso);
-	f->segActual = atoi(ingreso);
+	///printw("\n");
+	int ingreso;
+	printw("Ingrese el tiempo de inicio: ");
+	scanw("%d", &ingreso);
+	//limpiar(ingreso);
+	f->segInicial = ingreso;
+	//printw("%d", f->segActual);
+	
+	printw("Ingrese el tiempo de fin: ");
+	scanw("%d",&ingreso);
+	//limpiar(ingreso);
+	f->segFinal = ingreso;
 
-	printf("Ingrese el tiempo de fin: ");
-	fgets(ingreso, 100, stdin);
-	limpiar(ingreso);
-	f->segFinal = atoi(ingreso);
+	//char* ingreso2 = (char *) malloc (50 * sizeof(char));
+	printw("Posición X: ");
+	scanw("%d", &ingreso);
+	//limpiar(ingreso2);
+	f->posX = ingreso;
+	//free(ingreso2);
 
-	char* ingreso2 = (char *) malloc (50 * sizeof(char));
-	printf("Posición X: ");
-	fgets(ingreso2, 50, stdin);
-	limpiar(ingreso2);
-	f->posX = atoi(ingreso2);
-
-	printf("Posición Y: ");
-	fgets(ingreso, 100, stdin);
-	limpiar(ingreso);
-	f->posY = atoi(ingreso);
+	printw("Posición Y: ");
+	scanw("%d", &ingreso);
+	//limpiar(ingreso);
+	f->posY = ingreso;
 
 	char* ingresoTipo = (char *) malloc (50 * sizeof(char));
-	printf("Ingrese el tipo: ");
-	fgets(ingresoTipo, 50, stdin);
-	limpiar(ingresoTipo);
+	printw("Ingrese el tipo: ");
+	scanw("%s", ingresoTipo);
+	//limpiar(ingresoTipo);
 	f->tipo = ingresoTipo;
 	f->siguiente = NULL;
 }

@@ -5,12 +5,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <ncurses.h>
 
 typedef struct archivoASCII
 {
+	int id;
 	int segInicial;
 	int segFinal;
-	int segActual;
 	char* tipo;
 	int posX;
 	int posY;
@@ -26,6 +27,7 @@ typedef struct datos
 	int largoCanvas;
 	int anchoCanvas;
 	int espacioOcupado;
+	int segActual;
 	Figura objetos;
 }*DatosAnimacion;
 

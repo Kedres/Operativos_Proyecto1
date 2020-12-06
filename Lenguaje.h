@@ -28,10 +28,11 @@ typedef struct datos
 	int anchoCanvas;
 	int espacioOcupado;
 	int segActual;
-	Figura objetos;
-}*DatosAnimacion;
+	Figura *objetos;
+}*Canvas;
 
 Figura prepararFigura();
+Canvas crearCanvas();
 void imprimirObjeto(char** objeto, int largo);
 void liberarFigura(Figura f);
 

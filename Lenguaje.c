@@ -144,6 +144,25 @@ void rellenarFigura(Figura f)
 	f->siguiente = NULL;
 }
 
+Canvas crearCanvas() 
+{
+	Canvas canvas = (Canvas) malloc(sizeof(Canvas));
+
+	printw("Ingrese el tiempo total de las animaciones: ");
+	
+	scanw("%d", &canvas->tiempoTotal);
+
+	printw("Ingrese el largo del canvas: ");
+	
+	scanw("%d", &canvas->largoCanvas);
+
+	printw("Ingrese el ancho del canvas: ");
+	
+	scanw("%d", &canvas->anchoCanvas);
+
+	return canvas;
+}
+
 void imprimirObjeto(char** objeto, int largo)
 {
 	for (int i = 0; i < largo; ++i)

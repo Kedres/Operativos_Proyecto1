@@ -28,7 +28,7 @@ typedef struct datos
 	int anchoCanvas;
 	int espacioOcupado;
 	int segActual;
-	Figura *objetos;
+	Figura objetos;
 }*Canvas;
 
 Figura prepararFigura();

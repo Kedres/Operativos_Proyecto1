@@ -1,6 +1,6 @@
 #include "Lenguaje.h"
 
-Figura cargarFigura(char* nombre);
+Figura cargarFigura();
 void limpiar (char *cadena);
 void liberarCaracteres(char** objeto, int largo);
 void rellenarFigura(Figura f);
@@ -9,19 +9,17 @@ void imprimirObjeto(char** objeto, int largo);
 
 Figura prepararFigura()
 {
-	char* ingreso = (char *) malloc (50 * sizeof(char));
-	//printf("Por favor ingerse el nombre de la figura: ");
-	//fgets(ingreso, 100, stdin);
-	//limpiar(ingreso);
-	Figura objeto = cargarFigura(ingreso);
+	Figura objeto = cargarFigura();
+
 	if (objeto != NULL)
 	{
 		rellenarFigura(objeto);
-		free(ingreso);
-		//liberarFigura(objeto);
-	}else{
+	}
+	else
+	{
 		printf("Nombre de figura equivocado\n");
 	}
+
 	return objeto;
 }
 
@@ -33,8 +31,10 @@ void limpiar (char *cadena)
     *p = '\0';
 }
 
-Figura cargarFigura(char* nombre)
+Figura cargarFigura()
 {
+	char* nombre = (char *) malloc (50 * sizeof(char));
+
 	Figura res = NULL;
 
 	char largo[3];
@@ -57,8 +57,10 @@ Figura cargarFigura(char* nombre)
 	{
 		//Manejo de errores
 		printw("No se logro encontrar el archivo\n");
-	}else
+	}
+	else
 	{
+		rewind(archivo);
 		printw("archivo encontrado\n");
 		while((caracter = fgetc(archivo)) != EOF)
 		{
@@ -106,6 +108,8 @@ Figura cargarFigura(char* nombre)
 		res->largo = largoNum;
 		fclose(archivo);
 	}
+
+	free(nombre);
 	return res;
 }
 
@@ -159,6 +163,10 @@ Canvas crearCanvas()
 	printw("Ingrese el ancho del canvas: ");
 	
 	scanw("%d", &canvas->anchoCanvas);
+
+	canvas->objetos = NULL;
+	canvas->espacioOcupado = 0;
+	canvas->segActual = 0;
 
 	return canvas;
 }

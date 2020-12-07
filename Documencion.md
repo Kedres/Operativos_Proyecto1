@@ -171,21 +171,30 @@ Horas Totales: 50 horas.
 
 #### Carlos Mora
 [1] [2] [3] [4] [5] Aprendizaje de Round Robin.[4]
+
 [1] [2] [3] [4] [5] Aprendizaje de Tiempo Real.[4]
+
 [1] [2] [3] [4] [5] Aprendizaje de Cambio de contexto.[5]
+
 [1] [2] [3] [4] [5] Aprendizaje de Sorteo.[5]
 
 #### Kevin Segura 
 [1] [2] [3] [4] [5] Aprendizaje de Round Robin.[5]
+
 [1] [2] [3] [4] [5] Aprendizaje de Tiempo Real.[5]
+
 [1] [2] [3] [4] [5] Aprendizaje de Cambio de contexto.[4]
+
 [1] [2] [3] [4] [5] Aprendizaje de Sorteo.[5]
 
 
 #### Jorge Gatgens
 [1] [2] [3] [4] [5] Aprendizaje de Round Robin. [4]
+
 [1] [2] [3] [4] [5] Aprendizaje de Tiempo Real.[3]
+
 [1] [2] [3] [4] [5] Aprendizaje de Cambio de contexto. [2]
+
 [1] [2] [3] [4] [5] Aprendizaje de Sorteo. [4]
 
 

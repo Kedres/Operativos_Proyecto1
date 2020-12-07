@@ -49,7 +49,9 @@ Github: Utilizamos este servicio como alojamiento de nuestro repositorio del pro
 
 ### Librerías utilizadas 
 
-#### Ncurses
+#### Ncurses.h
+### UContext.h
+### String.h
 
 
 ### Biblioteca mypthreads

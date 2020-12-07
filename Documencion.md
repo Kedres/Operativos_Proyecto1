@@ -17,11 +17,14 @@
 
 Se recreará la biblioteca de pthread para entender cómo se puede hacer un subsistema dentro del mismo OS sin tocar el kernel principal. Además de esto se tendrá que hacer un programa que utilice la nueva biblioteca. Esta deberá tener las mismas funciones que la biblioteca original thread, pero además de estas tendrá una nueva llamada my_thread_chsched que se encargará de seleccionar el tipo de scheduling con que se ejecutara el hilo, entre los cuales tendremos RoundRobin, Sorteo y Tiempo Real. 
 
-	La nueva biblioteca deberá funcionar como una homóloga a la biblioteca original, es decir que se podrá compilar un proyecto que haya usado la biblioteca original cambiandola por la creada en este proyecto.
+La nueva biblioteca deberá funcionar como una homóloga a la biblioteca original, es decir que se podrá compilar un proyecto que haya usado la biblioteca original
+cambiandola por la creada en este proyecto.
 
-	Finalmente, el programa a crear para utilizar la nueva biblioteca será uno que muestre animaciones de caracteres ASCII en un canvas, esta será la pantalla donde se mostrarán las animaciones y podrá estar distribuida entre varios monitores.
+Finalmente, el programa a crear para utilizar la nueva biblioteca será uno que muestre animaciones de caracteres ASCII en un canvas, esta será la pantalla donde se 
+mostrarán las animaciones y podrá estar distribuida entre varios monitores.
 
-	Habrá un lenguaje en el programa que permitirá establecer las propiedades o parámetros de cada animación y el programa. La aplicación permitirá correrse en distintas PCs donde cada una se comunicará a través de sockets y estas aportarán su monitor para el despliegue de las animaciones.
+Habrá un lenguaje en el programa que permitirá establecer las propiedades o parámetros de cada animación y el programa. La aplicación permitirá correrse en distintas 
+PCs donde cada una se comunicará a través de sockets y estas aportarán su monitor para el despliegue de las animaciones.
 
 
 
